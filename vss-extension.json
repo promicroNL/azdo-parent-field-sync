@@ -1,0 +1,90 @@
+{
+  "manifestVersion": 1,
+  "id": "parent-field-sync",
+  "version": "1.0.0",
+  "name": "Parent Field Sync",
+  "publisher": "promicro",
+  "description": "Keep Azure Boards child work items aligned by copying selected field values from their parents in a scheduled pipeline.",
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "categories": [
+    "Azure Boards",
+    "Azure Pipelines"
+  ],
+  "tags": [
+    "Azure Boards",
+    "work items",
+    "parent child",
+    "field synchronization",
+    "pipeline task"
+  ],
+  "icons": {
+    "default": "images/extension-icon.png"
+  },
+  "branding": {
+    "color": "#061842",
+    "theme": "dark"
+  },
+  "galleryFlags": [
+    "Preview"
+  ],
+  "content": {
+    "details": {
+      "path": "docs/marketplace.md"
+    },
+    "license": {
+      "path": "LICENSE"
+    }
+  },
+  "links": {
+    "getstarted": {
+      "uri": "https://github.com/promicroNL/azdo-parent-field-sync#quick-start"
+    },
+    "learn": {
+      "uri": "https://github.com/promicroNL/azdo-parent-field-sync/blob/main/docs/configuration.md"
+    },
+    "support": {
+      "uri": "https://github.com/promicroNL/azdo-parent-field-sync/issues"
+    },
+    "privacypolicy": {
+      "uri": "https://github.com/promicroNL/azdo-parent-field-sync/blob/main/PRIVACY.md"
+    },
+    "license": {
+      "uri": "https://github.com/promicroNL/azdo-parent-field-sync/blob/main/LICENSE"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "uri": "https://github.com/promicroNL/azdo-parent-field-sync.git"
+  },
+  "files": [
+    {
+      "path": "build/ParentFieldSync"
+    },
+    {
+      "path": "images/extension-icon.png"
+    },
+    {
+      "path": "docs/marketplace.md"
+    },
+    {
+      "path": "LICENSE"
+    }
+  ],
+  "contributions": [
+    {
+      "id": "parent-field-sync-task",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "build/ParentFieldSync"
+      }
+    }
+  ]
+}
+

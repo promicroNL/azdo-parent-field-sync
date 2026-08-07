@@ -1,0 +1,62 @@
+# Configuration
+
+## Task inputs
+
+| Input | Required | Default | Description |
+| --- | --- | --- | --- |
+| `parentWorkItemType` | Yes | `User Story` | Exact parent work item type name. |
+| `childWorkItemType` | Yes | `Task` | Exact child type queried and updated. |
+| `fieldMappings` | Yes | `Custom.Process` | One source or source-to-target mapping per line. |
+| `preserveChildValueWhenParentEmpty` | No | `false` | Do not clear a child field when its parent field is empty. |
+| `preserveChildValueWhenNoParent` | No | `false` | Do not clear mapped fields when a child has no parent. |
+| `dryRun` | No | `false` | Calculate and log changes without updating work items. |
+
+Blank lines and lines beginning with `#` are ignored in `fieldMappings`.
+
+```yaml
+fieldMappings: |
+  # Same source and target reference name
+  Custom.Process
+
+  # Different target reference name
+  Custom.Customer=Custom.ChildCustomer
+```
+
+Each target field can appear only once. The task validates every field against its configured work item type before querying work items.
+
+## Authentication and permissions
+
+No PAT or service connection input is required. The task uses the short-lived job access token supplied by Azure Pipelines through `SystemVssConnection`.
+
+The pipeline's build service identity needs these Azure Boards permissions in the relevant project/area path:
+
+- View work items in this node
+- Edit work items in this node
+
+For a project-scoped job token, the identity is normally named `<Project Name> Build Service (<Organization Name>)`. Keep job authorization scope limited to the current project unless the pipeline genuinely needs broader access.
+
+## Scheduling
+
+An Azure DevOps extension cannot execute unattended code inside the Azure DevOps service. Schedule the task through a YAML pipeline. See [`examples/scheduled-sync.yml`](../examples/scheduled-sync.yml).
+
+Azure Pipelines evaluates scheduled YAML from the configured branch. With `always: true`, the task runs even when the repository has not changed.
+
+## Clearing behavior
+
+The default is authoritative parent-to-child synchronization:
+
+- An empty or missing parent source field removes the target field from the child.
+- A child with no parent has every populated mapped target field removed.
+- A child whose parent has a different work item type is left unchanged.
+- A parent that cannot be read is reported and the child is left unchanged.
+
+Enable either preservation input when clearing is not desired. Start with `dryRun: true` when adopting the task in an existing project.
+
+## Limits
+
+- Direct parent/child hierarchy links only.
+- A WIQL query can return at most the Azure DevOps service limit for a single query.
+- Work item reads are automatically split into batches of 200.
+- Identity, HTML, tree-path, and other object-valued fields are intentionally rejected.
+- Azure DevOps field rules and permissions still apply to every update.
+
