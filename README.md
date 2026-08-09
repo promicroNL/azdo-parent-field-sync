@@ -1,106 +1,79 @@
-# azdo-parent-field-sync
+# Parent Field Sync
 
-This repository contains lightweight PowerShell scripts for Azure DevOps work item automation.
+Parent Field Sync is an Azure DevOps extension that adds a cross-platform Azure Pipelines task for copying selected Azure Boards fields from parent work items to their children.
 
-## Goal
+The task uses the pipeline job token, calls only the Azure DevOps organization where the pipeline runs, batches reads, and combines all field changes for a child into one revision-checked update.
 
-Keep child work items aligned with their parent by syncing selected parent field values down to linked child items.
+## Quick start
 
-## What the scripts are for
+1. Install the extension into your Azure DevOps organization.
+2. Make sure the project's build service identity can view and edit work items.
+3. Add a scheduled pipeline with the task:
 
-- Query parent/child relationships in Azure DevOps
-- Read configured fields from parent work items
-- Update those fields on child work items
-- Run quickly with minimal dependencies and simple configuration
+```yaml
+trigger: none
+pr: none
 
-## Scope
+schedules:
+- cron: "*/30 * * * *"
+  displayName: Synchronize every 30 minutes
+  branches:
+    include:
+    - main
+  always: true
 
-The focus is small, practical PowerShell tooling for scheduled or manual sync runs, not a large service or framework.
+pool:
+  vmImage: ubuntu-latest
 
-## Basic usage
+steps:
+- checkout: none
 
-Run the script from the scripts folder with your Azure DevOps organization, project, and source field reference name:
-
-```powershell
-./Sync-ParentFieldToChildren.ps1 `
-  -OrganizationUrl 'https://dev.azure.com/your-org' `
-  -Project 'Your Project' `
-  -SourceFieldReferenceName 'Custom.Process'
+- task: ParentFieldSync@1
+  inputs:
+    parentWorkItemType: User Story
+    childWorkItemType: Task
+    fieldMappings: |
+      Custom.Process
+      Custom.Customer=Custom.ChildCustomer
+      System.Tags
 ```
 
-The script will copy the value from the parent work item field to matching child work items that are linked through the parent/child hierarchy.
+Use `Source.ReferenceName` when the same field exists on both types. Use `Source.ReferenceName=Target.ReferenceName` to copy to a differently named child field.
 
-## Example: sync a custom field
+## Behavior
 
-If you want to copy a custom field from a parent User Story to child Tasks:
+- Only direct parent links (`System.LinkTypes.Hierarchy-Reverse`) are considered.
+- Only parents with the configured parent work item type are used.
+- Scalar values used by text, picklist, numeric, boolean, date, GUID, custom, and `System.Tags` fields are supported.
+- Object-valued fields, such as Identity fields, are not supported.
+- Empty parent values clear child values by default.
+- Children without a parent have mapped values cleared by default.
+- `dryRun: true` reports intended changes without writing them.
+- Multiple mappings are applied to each child in one JSON Patch request guarded by the child's revision.
 
-```powershell
-./Sync-ParentFieldToChildren.ps1 `
-  -OrganizationUrl 'https://dev.azure.com/your-org' `
-  -Project 'Your Project' `
-  -SourceFieldReferenceName 'Custom.Process' `
-  -ParentWorkItemType 'User Story' `
-  -ChildWorkItemType 'Task'
+See [configuration](docs/configuration.md), [publishing](docs/publishing.md), and the full [scheduled pipeline example](examples/scheduled-sync.yml).
+
+## Development
+
+Requirements: Node.js 20 or later and Corepack (included with Node.js 20).
+
+```text
+corepack enable
+pnpm install --frozen-lockfile
+pnpm run typecheck
+pnpm test
+pnpm run build
+pnpm run package:vsix
 ```
 
-## Example: sync to a different child field
+The VSIX is written to `dist/`. Generated build output and packages are intentionally excluded from source control.
 
-You can also sync the parent field to a differently named child field:
+The manifest currently uses the Marketplace publisher ID `promicro`, matching this repository's organization. Change `publisher` in `vss-extension.json` before packaging if your Marketplace publisher ID differs.
 
-```powershell
-./Sync-ParentFieldToChildren.ps1 `
-  -OrganizationUrl 'https://dev.azure.com/your-org' `
-  -Project 'Your Project' `
-  -SourceFieldReferenceName 'Custom.Process' `
-  -TargetFieldReferenceName 'Custom.ChildProcess'
-```
+## Security and privacy
 
-## Example: sync tags
+The task does not collect telemetry or send data to third parties. It receives the Azure Pipelines job token through the built-in `SystemVssConnection`, masks it, and uses it only for Azure DevOps Work Item Tracking REST calls. See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md).
 
-Tags are supported when you use the built-in tag field:
+## License
 
-```powershell
-./Sync-ParentFieldToChildren.ps1 `
-  -OrganizationUrl 'https://dev.azure.com/your-org' `
-  -Project 'Your Project' `
-  -SourceFieldReferenceName 'System.Tags'
-```
-
-This copies the parent work item's tag string to the child work item field. It does not create or manage individual tags as separate entities; it copies the full field value.
-
-## Example: preserve child values when the parent is empty
-
-Use these switches if you want to avoid clearing child values when the parent has no value:
-
-```powershell
-./Sync-ParentFieldToChildren.ps1 `
-  -OrganizationUrl 'https://dev.azure.com/your-org' `
-  -Project 'Your Project' `
-  -SourceFieldReferenceName 'Custom.Process' `
-  -PreserveChildValueWhenParentEmpty `
-  -PreserveChildValueWhenNoParent
-```
-
-## Notes
-
-- Use the Azure DevOps field reference name, not the display name.
-- The script is intended for scalar fields such as strings, picklists, numbers, booleans, dates, and GUIDs.
-- For tags, use System.Tags as the field reference name.
-- The script validates that both the source and target fields are available on the selected parent and child work item types.
-
-## Authentication
-
-The script can use either:
-
-- an Azure DevOps PAT from the AZDO_PAT environment variable, or
-- the SYSTEM_ACCESSTOKEN environment variable in Azure Pipelines
-
-Example for a local run:
-
-```powershell
-$env:AZDO_PAT = 'your-pat-here'
-./Sync-ParentFieldToChildren.ps1 `
-  -OrganizationUrl 'https://dev.azure.com/your-org' `
-  -Project 'Your Project' `
-  -SourceFieldReferenceName 'Custom.Process'
-```
+[MIT](LICENSE)

@@ -1,0 +1,80 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
+  "id": "074f1bb4-78b5-4c6b-878d-7ce408824409",
+  "name": "ParentFieldSync",
+  "friendlyName": "Parent Field Sync",
+  "description": "Copies selected Azure Boards field values from parent work items to their child work items.",
+  "helpMarkDown": "[Documentation](https://github.com/promicroNL/azdo-parent-field-sync/blob/main/docs/configuration.md)",
+  "category": "Utility",
+  "author": "Promicro",
+  "version": {
+    "Major": 1,
+    "Minor": 0,
+    "Patch": 2
+  },
+  "minimumAgentVersion": "3.232.1",
+  "instanceNameFormat": "Sync $(parentWorkItemType) fields to $(childWorkItemType)",
+  "inputs": [
+    {
+      "name": "parentWorkItemType",
+      "type": "string",
+      "label": "Parent work item type",
+      "defaultValue": "User Story",
+      "required": true,
+      "helpMarkDown": "The exact Azure Boards work item type of the parent, for example `User Story` or `Product Backlog Item`."
+    },
+    {
+      "name": "childWorkItemType",
+      "type": "string",
+      "label": "Child work item type",
+      "defaultValue": "Task",
+      "required": true,
+      "helpMarkDown": "The exact Azure Boards work item type to query and update."
+    },
+    {
+      "name": "fieldMappings",
+      "type": "multiLine",
+      "label": "Field mappings",
+      "defaultValue": "Custom.Process",
+      "required": true,
+      "helpMarkDown": "One mapping per line. Use `Source.ReferenceName` when source and target match, or `Source.ReferenceName=Target.ReferenceName` to map different fields."
+    },
+    {
+      "name": "preserveChildValueWhenParentEmpty",
+      "type": "boolean",
+      "label": "Preserve value when parent field is empty",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "When disabled, an empty parent field clears the corresponding child field."
+    },
+    {
+      "name": "preserveChildValueWhenNoParent",
+      "type": "boolean",
+      "label": "Preserve value when child has no parent",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "When disabled, mapped fields are cleared on child work items without a parent."
+    },
+    {
+      "name": "dryRun",
+      "type": "boolean",
+      "label": "Dry run",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "Reports intended updates without changing work items."
+    }
+  ],
+  "execution": {
+    "Node20_1": {
+      "target": "index.js"
+    }
+  },
+  "restrictions": {
+    "commands": {
+      "mode": "restricted"
+    },
+    "settableVariables": {
+      "allowed": []
+    }
+  }
+}

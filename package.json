@@ -1,0 +1,28 @@
+{
+  "name": "azdo-parent-field-sync",
+  "version": "1.0.2",
+  "private": true,
+  "packageManager": "pnpm@11.16.0",
+  "description": "Azure DevOps extension task that synchronizes parent work item fields to child work items.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tasks/ParentFieldSync/test/**/*.test.ts",
+    "build": "node scripts/build.mjs",
+    "package:vsix": "node scripts/package.mjs"
+  },
+  "dependencies": {
+    "azure-pipelines-task-lib": "^5.2.10",
+    "typed-rest-client": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.9",
+    "@vercel/ncc": "^0.38.4",
+    "tfx-cli": "^0.22.3",
+    "tsx": "^4.20.3",
+    "typescript": "^5.9.2"
+  }
+}

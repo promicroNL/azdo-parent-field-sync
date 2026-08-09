@@ -1,0 +1,42 @@
+trigger:
+  branches:
+    include:
+    - main
+
+pr:
+  branches:
+    include:
+    - main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- checkout: self
+
+- task: NodeTool@0
+  displayName: Use Node.js 20
+  inputs:
+    versionSpec: 20.x
+
+- script: |
+    corepack enable
+    corepack prepare pnpm@11.16.0 --activate
+    pnpm install --frozen-lockfile
+  displayName: Install dependencies
+
+- script: pnpm run typecheck
+  displayName: Type-check task
+
+- script: pnpm test
+  displayName: Run unit tests
+
+- script: pnpm run build
+  displayName: Build extension task
+
+- script: pnpm run package:vsix
+  displayName: Package VSIX
+
+- publish: $(Build.SourcesDirectory)/dist
+  displayName: Publish VSIX artifact
+  artifact: azure-devops-extension

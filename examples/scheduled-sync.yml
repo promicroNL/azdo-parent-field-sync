@@ -1,0 +1,30 @@
+trigger: none
+pr: none
+
+schedules:
+- cron: "*/30 * * * *"
+  displayName: Synchronize every 30 minutes
+  branches:
+    include:
+    - main
+  always: true
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- checkout: none
+
+- task: ParentFieldSync@1
+  displayName: Sync parent fields to tasks
+  inputs:
+    parentWorkItemType: User Story
+    childWorkItemType: Task
+    fieldMappings: |
+      Custom.Process
+      Custom.Customer=Custom.ChildCustomer
+      System.Tags
+    preserveChildValueWhenParentEmpty: false
+    preserveChildValueWhenNoParent: true
+    dryRun: false
+
