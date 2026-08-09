@@ -1,7 +1,7 @@
 {
   "manifestVersion": 1,
   "id": "parent-field-sync",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "name": "Parent Field Sync",
   "publisher": "promicro",
   "description": "Keep Azure Boards child work items aligned by copying selected field values from their parents in a scheduled pipeline.",
@@ -29,6 +29,7 @@
     "theme": "dark"
   },
   "galleryFlags": [
+    "Public",
     "Preview"
   ],
   "content": {
@@ -63,15 +64,6 @@
   "files": [
     {
       "path": "build/ParentFieldSync"
-    },
-    {
-      "path": "images/extension-icon.png"
-    },
-    {
-      "path": "docs/marketplace.md"
-    },
-    {
-      "path": "LICENSE"
     }
   ],
   "contributions": [
@@ -87,4 +79,3 @@
     }
   ]
 }
-

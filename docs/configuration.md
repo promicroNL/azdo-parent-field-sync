@@ -57,6 +57,5 @@ Enable either preservation input when clearing is not desired. Start with `dryRu
 - Direct parent/child hierarchy links only.
 - A WIQL query can return at most the Azure DevOps service limit for a single query.
 - Work item reads are automatically split into batches of 200.
-- Identity, HTML, tree-path, and other object-valued fields are intentionally rejected.
+- Object-valued fields, such as Identity fields, are not supported; mapped values must be strings, numbers, booleans, or null.
 - Azure DevOps field rules and permissions still apply to every update.
-

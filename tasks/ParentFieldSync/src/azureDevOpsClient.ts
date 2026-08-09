@@ -45,7 +45,7 @@ export class AzureDevOpsClient implements WorkItemClient {
     const normalizedOrganizationUrl = organizationUrl.replace(/\/+$/u, "");
     this.apiBase = `${normalizedOrganizationUrl}/${encodeURIComponent(project)}/_apis/wit`;
     this.httpClient = new httpm.HttpClient(
-      "promicro-parent-field-sync/1.0",
+      "promicro-parent-field-sync/1.0.2",
       [new BearerCredentialHandler(accessToken)],
       {
         allowRetries: true,
@@ -96,13 +96,14 @@ export class AzureDevOpsClient implements WorkItemClient {
       const batch = ids.slice(offset, offset + MAX_BATCH_SIZE);
       const query = new URLSearchParams({
         ids: batch.join(","),
-        fields: [...new Set(fields)].join(","),
         errorPolicy: "Omit",
         "api-version": API_VERSION
       });
 
       if (includeRelations) {
         query.set("$expand", "Relations");
+      } else {
+        query.set("fields", [...new Set(fields)].join(","));
       }
 
       const response = await this.request<ListResponse<WorkItem>>(

@@ -6,11 +6,11 @@
   "description": "Copies selected Azure Boards field values from parent work items to their child work items.",
   "helpMarkDown": "[Documentation](https://github.com/promicroNL/azdo-parent-field-sync/blob/main/docs/configuration.md)",
   "category": "Utility",
-  "author": "ProMicro",
+  "author": "Promicro",
   "version": {
     "Major": 1,
     "Minor": 0,
-    "Patch": 0
+    "Patch": 2
   },
   "minimumAgentVersion": "3.232.1",
   "instanceNameFormat": "Sync $(parentWorkItemType) fields to $(childWorkItemType)",
@@ -78,4 +78,3 @@
     }
   }
 }
-

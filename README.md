@@ -1,6 +1,6 @@
 # Parent Field Sync
 
-Parent Field Sync is a publishable Azure DevOps extension that adds a cross-platform Azure Pipelines task for copying selected Azure Boards fields from parent work items to their children.
+Parent Field Sync is an Azure DevOps extension that adds a cross-platform Azure Pipelines task for copying selected Azure Boards fields from parent work items to their children.
 
 The task uses the pipeline job token, calls only the Azure DevOps organization where the pipeline runs, batches reads, and combines all field changes for a child into one revision-checked update.
 
@@ -44,7 +44,8 @@ Use `Source.ReferenceName` when the same field exists on both types. Use `Source
 
 - Only direct parent links (`System.LinkTypes.Hierarchy-Reverse`) are considered.
 - Only parents with the configured parent work item type are used.
-- Strings, picklists, numbers, booleans, dates, GUIDs, and `System.Tags` are supported.
+- Scalar values used by text, picklist, numeric, boolean, date, GUID, custom, and `System.Tags` fields are supported.
+- Object-valued fields, such as Identity fields, are not supported.
 - Empty parent values clear child values by default.
 - Children without a parent have mapped values cleared by default.
 - `dryRun: true` reports intended changes without writing them.
