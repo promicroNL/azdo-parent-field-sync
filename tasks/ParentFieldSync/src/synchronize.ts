@@ -10,6 +10,7 @@ import type {
 } from "./types";
 
 const PARENT_RELATION_TYPE = "System.LinkTypes.Hierarchy-Reverse";
+const TAGS_FIELD_REFERENCE_NAME = "system.tags";
 
 interface FieldState {
   exists: boolean;
@@ -40,6 +41,10 @@ function asScalar(value: unknown, mapping: FieldMapping, parentId: number): Fiel
 
 function valuesEqual(left: unknown, right: FieldValue): boolean {
   return Object.is(left, right);
+}
+
+function isTagsField(referenceName: string): boolean {
+  return referenceName.toLocaleLowerCase("en-US") === TAGS_FIELD_REFERENCE_NAME;
 }
 
 function getParentId(child: WorkItem): number | undefined {
@@ -83,7 +88,7 @@ function addClearMutation(
     return;
   }
 
-  mutations.push({ field: targetField, remove: true });
+  mutations.push({ field: targetField, operation: "remove" });
 }
 
 function planMappedField(
@@ -112,7 +117,11 @@ function planMappedField(
     return;
   }
 
-  mutations.push({ field: mapping.target, remove: false, value: desiredValue });
+  const operation =
+    options.replaceChildTags && isTagsField(mapping.target) && targetState.exists
+      ? "replace"
+      : "add";
+  mutations.push({ field: mapping.target, operation, value: desiredValue });
 }
 
 export async function synchronize(
@@ -229,7 +238,7 @@ export async function synchronize(
 
       stats.updatedWorkItems += 1;
       stats.updatedFields += mutations.length;
-      stats.clearedFields += mutations.filter((mutation) => mutation.remove).length;
+      stats.clearedFields += mutations.filter((mutation) => mutation.operation === "remove").length;
     } catch (error) {
       stats.errors += 1;
       const message = error instanceof Error ? error.message : String(error);

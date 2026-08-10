@@ -1,6 +1,6 @@
 {
   "name": "azdo-parent-field-sync",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "private": true,
   "packageManager": "pnpm@11.16.0",
   "description": "Azure DevOps extension task that synchronizes parent work item fields to child work items.",

@@ -9,6 +9,7 @@
 | `fieldMappings` | Yes | `Custom.Process` | One source or source-to-target mapping per line. |
 | `preserveChildValueWhenParentEmpty` | No | `false` | Do not clear a child field when its parent field is empty. |
 | `preserveChildValueWhenNoParent` | No | `false` | Do not clear mapped fields when a child has no parent. |
+| `replaceChildTags` | No | `false` | Replace the child's complete `System.Tags` value instead of adding parent tags. |
 | `dryRun` | No | `false` | Calculate and log changes without updating work items. |
 
 Blank lines and lines beginning with `#` are ignored in `fieldMappings`.
@@ -23,6 +24,12 @@ fieldMappings: |
 ```
 
 Each target field can appear only once. The task validates every field against its configured work item type before querying work items.
+
+## Tag behavior
+
+Azure DevOps treats an `add` update to `System.Tags` as an additive operation. By default, mappings targeting `System.Tags` add the mapped parent tags while preserving tags that exist only on the child.
+
+Set `replaceChildTags: true` to make the mapped value authoritative. When the child already has tags, the task uses a replace operation so child-only tags are removed. When the child has no tag value yet, the task adds the mapped tags. The option is based on the target field, so it also applies to a cross-field mapping such as `Custom.ParentTags=System.Tags`.
 
 ## Authentication and permissions
 
@@ -43,7 +50,7 @@ Azure Pipelines evaluates scheduled YAML from the configured branch. With `alway
 
 ## Clearing behavior
 
-The default is authoritative parent-to-child synchronization:
+The default is authoritative parent-to-child synchronization for fields other than `System.Tags`:
 
 - An empty or missing parent source field removes the target field from the child.
 - A child with no parent has every populated mapped target field removed.

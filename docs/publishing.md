@@ -20,7 +20,7 @@ pnpm run build
 pnpm run package:vsix
 ```
 
-Upload the versioned VSIX from `dist` (currently `promicro.parent-field-sync-1.0.2.vsix`) in the Visual Studio Marketplace publishing portal. New extensions are private by default. Share the private extension with a test organization, install it, and verify both dry-run and update behavior before making it public. A public listing requires a verified publisher.
+Upload the versioned VSIX from `dist` (currently `promicro.parent-field-sync-1.1.0.vsix`) in the Visual Studio Marketplace publishing portal. New extensions are private by default. Share the private extension with a test organization, install it, and verify both dry-run and update behavior before making it public. A public listing requires a verified publisher.
 
 The production manifest is currently marked `Public` and `Preview`. Keep `Preview` for an initial public release; remove it in a future version when the extension is ready to be presented as generally available.
 

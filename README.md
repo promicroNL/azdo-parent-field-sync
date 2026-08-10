@@ -36,6 +36,7 @@ steps:
       Custom.Process
       Custom.Customer=Custom.ChildCustomer
       System.Tags
+    replaceChildTags: true
 ```
 
 Use `Source.ReferenceName` when the same field exists on both types. Use `Source.ReferenceName=Target.ReferenceName` to copy to a differently named child field.
@@ -48,6 +49,8 @@ Use `Source.ReferenceName` when the same field exists on both types. Use `Source
 - Object-valued fields, such as Identity fields, are not supported.
 - Empty parent values clear child values by default.
 - Children without a parent have mapped values cleared by default.
+- `System.Tags` mappings add parent tags and preserve child-only tags by default.
+- `replaceChildTags: true` makes mappings targeting `System.Tags` replace the child's complete tag set.
 - `dryRun: true` reports intended changes without writing them.
 - Multiple mappings are applied to each child in one JSON Patch request guarded by the child's revision.
 

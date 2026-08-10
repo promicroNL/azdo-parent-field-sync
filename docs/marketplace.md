@@ -11,6 +11,7 @@ Parent Field Sync adds a native Azure Pipelines task that copies one or more fie
 - Authenticate with the short-lived Azure Pipelines job token.
 - Preview changes with dry-run mode.
 - Choose whether empty parent fields and missing parents clear or preserve child values.
+- Merge parent tags by default or opt into exact `System.Tags` replacement.
 - Batch work item reads and combine each child's changes into one revision-checked update.
 - No external service, telemetry, database, or third-party data transfer.
 
@@ -25,6 +26,7 @@ Parent Field Sync adds a native Azure Pipelines task that copies one or more fie
       Custom.Process
       Custom.Customer=Custom.ChildCustomer
       System.Tags
+    replaceChildTags: true
     dryRun: true
 ```
 
