@@ -59,6 +59,8 @@ The default is authoritative parent-to-child synchronization for fields other th
 
 Enable either preservation input when clearing is not desired. Start with `dryRun: true` when adopting the task in an existing project.
 
+For reporting-field mappings, safe read-only rules, picklist guidance, reparenting, and scheduled reconciliation examples, see [Example uses and recommendations](../README.md#example-uses-and-recommendations).
+
 ## Limits
 
 - Direct parent/child hierarchy links only.
