@@ -19,7 +19,7 @@ interface WorkItemTypeField {
 }
 
 interface JsonPatchOperation {
-  op: "test" | "add" | "remove";
+  op: "test" | "add" | "replace" | "remove";
   path: string;
   value?: unknown;
 }
@@ -45,7 +45,7 @@ export class AzureDevOpsClient implements WorkItemClient {
     const normalizedOrganizationUrl = organizationUrl.replace(/\/+$/u, "");
     this.apiBase = `${normalizedOrganizationUrl}/${encodeURIComponent(project)}/_apis/wit`;
     this.httpClient = new httpm.HttpClient(
-      "promicro-parent-field-sync/1.0.2",
+      "promicro-parent-field-sync/1.1.0",
       [new BearerCredentialHandler(accessToken)],
       {
         allowRetries: true,
@@ -129,11 +129,11 @@ export class AzureDevOpsClient implements WorkItemClient {
       },
       ...mutations.map((mutation): JsonPatchOperation => {
         const operation: JsonPatchOperation = {
-          op: mutation.remove ? "remove" : "add",
+          op: mutation.operation,
           path: `/fields/${escapeJsonPointerSegment(mutation.field)}`
         };
 
-        if (!mutation.remove) {
+        if (mutation.operation !== "remove") {
           operation.value = mutation.value;
         }
 

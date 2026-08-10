@@ -9,8 +9,8 @@
   "author": "Promicro",
   "version": {
     "Major": 1,
-    "Minor": 0,
-    "Patch": 2
+    "Minor": 1,
+    "Patch": 0
   },
   "minimumAgentVersion": "3.232.1",
   "instanceNameFormat": "Sync $(parentWorkItemType) fields to $(childWorkItemType)",
@@ -54,6 +54,14 @@
       "defaultValue": "false",
       "required": false,
       "helpMarkDown": "When disabled, mapped fields are cleared on child work items without a parent."
+    },
+    {
+      "name": "replaceChildTags",
+      "type": "boolean",
+      "label": "Replace child tags",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "When enabled, a mapping targeting `System.Tags` replaces the child's complete tag set. When disabled, parent tags are added while child-only tags are preserved."
     },
     {
       "name": "dryRun",

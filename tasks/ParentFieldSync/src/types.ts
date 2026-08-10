@@ -17,11 +17,16 @@ export interface WorkItem {
   relations?: WorkItemRelation[];
 }
 
-export interface FieldMutation {
-  field: string;
-  remove: boolean;
-  value?: FieldValue;
-}
+export type FieldMutation =
+  | {
+      field: string;
+      operation: "remove";
+    }
+  | {
+      field: string;
+      operation: "add" | "replace";
+      value: FieldValue;
+    };
 
 export interface WorkItemClient {
   assertFieldAvailable(workItemType: string, fieldReferenceName: string): Promise<void>;
@@ -47,6 +52,7 @@ export interface SyncOptions {
   fieldMappings: FieldMapping[];
   preserveChildValueWhenParentEmpty: boolean;
   preserveChildValueWhenNoParent: boolean;
+  replaceChildTags: boolean;
   dryRun: boolean;
 }
 
@@ -62,4 +68,3 @@ export interface SyncStats {
   missingParent: number;
   errors: number;
 }
-

@@ -84,6 +84,7 @@ async function run(): Promise<void> {
           false
         ),
         preserveChildValueWhenNoParent: task.getBoolInput("preserveChildValueWhenNoParent", false),
+        replaceChildTags: task.getBoolInput("replaceChildTags", false),
         dryRun
       },
       logger

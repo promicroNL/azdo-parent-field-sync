@@ -70,6 +70,7 @@ const defaultOptions: SyncOptions = {
   ],
   preserveChildValueWhenParentEmpty: false,
   preserveChildValueWhenNoParent: false,
+  replaceChildTags: false,
   dryRun: false
 };
 
@@ -112,7 +113,7 @@ test("updates all changed mappings in one work item request", async () => {
     {
       id: 10,
       revision: 7,
-      mutations: [{ field: "Custom.Process", remove: false, value: "New" }]
+      mutations: [{ field: "Custom.Process", operation: "add", value: "New" }]
     }
   ]);
   assert.equal(stats.updatedWorkItems, 1);
@@ -135,8 +136,8 @@ test("clears populated mapped fields when a child has no parent", async () => {
   const stats = await synchronize(client, defaultOptions, logger);
 
   assert.deepEqual(client.updates[0]?.mutations, [
-    { field: "Custom.Process", remove: true },
-    { field: "Custom.ChildCustomer", remove: true }
+    { field: "Custom.Process", operation: "remove" },
+    { field: "Custom.ChildCustomer", operation: "remove" }
   ]);
   assert.equal(stats.noParent, 1);
   assert.equal(stats.clearedFields, 2);
@@ -156,6 +157,116 @@ test("preserves child fields when the parent source is empty", async () => {
 
   assert.equal(client.updates.length, 0);
   assert.equal(stats.preservedFields, 2);
+});
+
+test("keeps additive tag updates by default", async () => {
+  const options: SyncOptions = {
+    ...defaultOptions,
+    fieldMappings: [{ source: "System.Tags", target: "System.Tags" }]
+  };
+  const client = new FakeClient(
+    [child({ "System.Tags": "ChildOnly; Shared" })],
+    [parent({ "System.Tags": "ParentOnly; Shared" })]
+  );
+
+  await synchronize(client, options, logger);
+
+  assert.deepEqual(client.updates[0]?.mutations, [
+    { field: "System.Tags", operation: "add", value: "ParentOnly; Shared" }
+  ]);
+});
+
+test("replaces existing tags when exact tag replacement is enabled", async () => {
+  const options: SyncOptions = {
+    ...defaultOptions,
+    fieldMappings: [
+      { source: "Custom.ParentTags", target: "System.Tags" },
+      { source: "Custom.Process", target: "Custom.Process" }
+    ],
+    replaceChildTags: true
+  };
+  const client = new FakeClient(
+    [child({ "System.Tags": "ChildOnly", "Custom.Process": "Old" })],
+    [parent({ "Custom.ParentTags": "ParentOnly", "Custom.Process": "New" })]
+  );
+
+  await synchronize(client, options, logger);
+
+  assert.deepEqual(client.updates[0]?.mutations, [
+    { field: "System.Tags", operation: "replace", value: "ParentOnly" },
+    { field: "Custom.Process", operation: "add", value: "New" }
+  ]);
+});
+
+test("adds tags when the child tag field does not exist in replacement mode", async () => {
+  const options: SyncOptions = {
+    ...defaultOptions,
+    fieldMappings: [{ source: "System.Tags", target: "System.Tags" }],
+    replaceChildTags: true
+  };
+  const client = new FakeClient([child({})], [parent({ "System.Tags": "ParentOnly" })]);
+
+  await synchronize(client, options, logger);
+
+  assert.deepEqual(client.updates[0]?.mutations, [
+    { field: "System.Tags", operation: "add", value: "ParentOnly" }
+  ]);
+});
+
+test("does not update equal tags in replacement mode", async () => {
+  const options: SyncOptions = {
+    ...defaultOptions,
+    fieldMappings: [{ source: "System.Tags", target: "System.Tags" }],
+    replaceChildTags: true
+  };
+  const client = new FakeClient(
+    [child({ "System.Tags": "ParentOnly; Shared" })],
+    [parent({ "System.Tags": "ParentOnly; Shared" })]
+  );
+
+  const stats = await synchronize(client, options, logger);
+
+  assert.equal(client.updates.length, 0);
+  assert.equal(stats.unchangedFields, 1);
+});
+
+test("keeps tag clearing and no-parent preservation independent of replacement mode", async () => {
+  const options: SyncOptions = {
+    ...defaultOptions,
+    fieldMappings: [{ source: "System.Tags", target: "System.Tags" }],
+    replaceChildTags: true
+  };
+  const childWithParent = child({ "System.Tags": "ChildOnly" });
+  const clearClient = new FakeClient([childWithParent], [parent({ "System.Tags": null })]);
+
+  await synchronize(clearClient, options, logger);
+
+  assert.deepEqual(clearClient.updates[0]?.mutations, [
+    { field: "System.Tags", operation: "remove" }
+  ]);
+
+  const preserveEmptyClient = new FakeClient(
+    [child({ "System.Tags": "ChildOnly" })],
+    [parent({ "System.Tags": null })]
+  );
+  const preserveEmptyStats = await synchronize(
+    preserveEmptyClient,
+    { ...options, preserveChildValueWhenParentEmpty: true },
+    logger
+  );
+
+  assert.equal(preserveEmptyClient.updates.length, 0);
+  assert.equal(preserveEmptyStats.preservedFields, 1);
+
+  const preserveClient = new FakeClient([child({ "System.Tags": "ChildOnly" }, false)], []);
+  const stats = await synchronize(
+    preserveClient,
+    { ...options, preserveChildValueWhenNoParent: true },
+    logger
+  );
+
+  assert.equal(preserveClient.updates.length, 0);
+  assert.equal(stats.preservedFields, 1);
 });
 
 test("dry run reports mutations without sending an update", async () => {

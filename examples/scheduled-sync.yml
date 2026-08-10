@@ -26,5 +26,5 @@ steps:
       System.Tags
     preserveChildValueWhenParentEmpty: false
     preserveChildValueWhenNoParent: true
+    replaceChildTags: true
     dryRun: false
-
