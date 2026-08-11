@@ -147,7 +147,7 @@ Task
 └── Completed Work
 ```
 
-See [configuration](docs/configuration.md), [publishing](docs/publishing.md), and the full [scheduled pipeline example](examples/scheduled-sync.yml).
+See the [changelog](CHANGELOG.md), [configuration](docs/configuration.md), [publishing](docs/publishing.md), and the full [scheduled pipeline example](examples/scheduled-sync.yml).
 
 ## Development
 
