@@ -31,6 +31,8 @@ Azure DevOps treats an `add` update to `System.Tags` as an additive operation. B
 
 Set `replaceChildTags: true` to make the mapped value authoritative. When the child already has tags, the task uses a replace operation so child-only tags are removed. When the child has no tag value yet, the task adds the mapped tags. The option is based on the target field, so it also applies to a cross-field mapping such as `Custom.ParentTags=System.Tags`.
 
+If the parent has a link but its mapped tag field is empty, `replaceChildTags` has no effect. By default, the child tags are cleared because an empty parent field clears the mapped child field. Set `preserveChildValueWhenParentEmpty: true` to keep the existing child tags in that case. This setting also preserves other mapped child fields whose parent values are empty.
+
 ## Authentication and permissions
 
 No PAT or service connection input is required. The task uses the short-lived job access token supplied by Azure Pipelines through `SystemVssConnection`.
